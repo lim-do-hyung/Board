@@ -1,11 +1,11 @@
 import React from 'react';
+import {Link} from 'react-router-dom';
 
 
 const BoardTitle  = () =>  {
     return (
         <div>
-            <h1>게시판</h1>
-            <hr />
+            <h1><Link to='/'>게시판</Link></h1>
         </div>
     )
 }

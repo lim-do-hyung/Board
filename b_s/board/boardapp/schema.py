@@ -14,9 +14,17 @@ class CommentType(DjangoObjectType):
 
 class Query(graphene.ObjectType):
     boards = graphene.List(BoardType)
+    selectedBoard = graphene.Field(BoardType, board_id=graphene.ID())
 
     def resolve_boards(self, info):
-        return Board.objects.all()
+        return Board.objects.all().order_by('-board_id') # -는 내림차순 정렬
+
+    def resolve_selectedBoard(self, info, board_id):
+        try:
+            return Board.objects.get(board_id=board_id)
+        except Board.DoesNotExist:
+            return None
+
 
 
 
@@ -30,7 +38,7 @@ class CreateBoard(graphene.Mutation):
 
 
     def mutate(self, info, title, contents, writer):
-        # todo 객체에 인자로 받은 Todo필드를 주입 
+        # board 객체에 인자로 받은 Board필드를 주입 
         board = Board(title=title, contents=contents, writer=writer)
 
         #db 저장
@@ -40,46 +48,46 @@ class CreateBoard(graphene.Mutation):
 
 
 
-# class UpdateTodo(graphene.Mutation):
-#     todo = graphene.Field(TodoType)
+class UpdateBoard(graphene.Mutation):
+    board = graphene.Field(BoardType)
 
-#     class Arguments:
-#         id = graphene.ID(required=True)
-#         title = graphene.String()
-#         completed = graphene.Boolean()
+    class Arguments:
+        id = graphene.ID(required=True)
+        title = graphene.String()
+        contents = graphene.String()
+        writer = graphene.String()
 
-#     def mutate(self, info, id, title=None, completed=None):
-#         # 전달받은 id로 레코드 가져옴 
-#         todo = Todo.objects.get(pk=id)
+    def mutate(self, info, id, title, contents, writer):
+        # 전달받은 id로 레코드 가져옴 
+        board = Board.objects.get(pk=id)
 
-#         # 기존 데이터에 덮어쓰기
-#         if title is not None:
-#             todo.title = title
-#         if completed is not None:
-#             todo.completed = completed
+        # 기존 데이터에 덮어쓰기
+        board.title = title
+        board.contents = contents
+        board.writer = writer
         
-#         #db에 수정된 내용 저장
-#         todo.save()
-#         return UpdateTodo(todo=todo)
+        #db에 수정된 내용 저장
+        board.save()
+        return UpdateBoard(board=board)
 
-# class DeleteTodo(graphene.Mutation):
-#     todo_id = graphene.Int()
+class DeleteBoard(graphene.Mutation):
+    board_id = graphene.Int()
 
-#     class Arguments:
-#         id = graphene.ID(required=True)
+    class Arguments:
+        id = graphene.ID(required=True)
 
-#     def mutate(self, info, id):
-#         # 전달받은 id로 레코드 가져옴 
-#         todo = Todo.objects.get(pk=id)
-#         # 레코드 삭제 
-#         todo.delete()
-#         return DeleteTodo(todo_id=id)
+    def mutate(self, info, id):
+        # 전달받은 id로 레코드 가져옴 
+        board = Board.objects.get(pk=id)
+        # 레코드 삭제 
+        board.delete()
+        return DeleteBoard(board_id=id)
 
 
 
 class Mutation(graphene.ObjectType):
     create_board = CreateBoard.Field()
-#    update_todo = UpdateTodo.Field()
-#    delete_todo = DeleteTodo.Field()
+    update_board = UpdateBoard.Field()
+    delete_board = DeleteBoard.Field()
 
 schema = graphene.Schema(query=Query,  mutation=Mutation)

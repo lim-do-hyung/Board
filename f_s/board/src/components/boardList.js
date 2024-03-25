@@ -32,6 +32,8 @@ const BoardList  = () =>  {
     return (
         <div>
         <BoardTitle/>
+        <h3>BoardList</h3>
+        <hr />
         <div className="board-main"> {/* class -> className으로 변경 */}
             <table>
             <colgroup>

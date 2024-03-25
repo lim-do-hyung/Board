@@ -13,9 +13,9 @@ const Board = () => {
     <Router>
       <Routes>
         <Route path="/" element={ <BoardList /> } />
-        <Route path="/view/:id" element={ <BoardView /> } />
+        <Route path="/view/:boardId" element={ <BoardView /> } />
         <Route path="/write" element={ <BoardWrite /> } />
-        <Route path="/update/:id" element={ <BoardUpdate /> } />
+        <Route path="/update/:boardId" element={ <BoardUpdate /> } />
       </Routes>
     </Router>
   );
